@@ -10,12 +10,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ConvertJsonToJava {
-    private String name;
     private int age;
-    private String phoneNo;
+    private String name;
+    private String[] phoneNo;
     
     public ConvertJsonToJava(Map<String, Object> map) {
-        
+            this.age=(int)map.get(age);
+            this.name=String.valueOf(map.get(name));
+            this.phoneNo=new Array(map.get(phoneNo));
+
     }
 
     public static Map<String, Object> convertJsonToMap(String json) throws JSONException {
@@ -41,13 +44,60 @@ public class ConvertJsonToJava {
         String json = "{\"name\":\"Paul\",\"age\":20,\"phoneNo\":[\"12345\",\"98765\",\"567890\"]}";
         // String json2 = "{\"name\": \"John Doe\", \"age\": 30, \"phoneNo\":\"0923456664\"}";
         Map<String, Object> data = convertJsonToMap(json);
-        ConvertJsonToJava obj1 = new ConvertJsonToJava(data);
-        // System.out.println(obj1.get);
-        Class<?> A=obj1.getClass();
-        Field fieldss[] = A.getDeclaredFields();
-        for(int i=0;i<fieldss.length;i++)
-        System.out.println(fieldss[i]);
+        // ConvertJsonToJava obj1 = new ConvertJsonToJava(data);
 
-        System.out.println(obj1.name + " " + obj1.age + " " + obj1.phoneNo);
+        Class Al=ConvertJsonToJava.class;
+        Field[] fields = Al.getDeclaredFields();
+        
+        
+        Map<String, String> fieldMap = new HashMap<>();
+        Map<String,Object>m1=new HashMap<>();
+ 
+
+         for (Field field : fields) {
+             String fieldName = field.getName();
+             String fieldType = field.getType().getSimpleName();
+             System.out.println(fieldName +" ... "+fieldType);
+             fieldMap.put(fieldName, fieldType);
+         }
+         for(String i:fieldMap.keySet()){
+            String val1=fieldMap.get(i);
+            String returndata=getPrimitiveTypeName(data.get(i).getClass().getSimpleName());
+            System.out.println(data.get(i).getClass().getSimpleName());
+            System.out.println(returndata);
+            
+            
+             System.out.println(val1);
+            // if(data.get(i).getClass().getSimpleName().equals("JSONArray")){
+            //     // String arr[]=data.get(i).split("");
+
+            // }
+            if(val1.equals(returndata) ){
+                System.out.println("true");
+                m1.put(i,data.get(i));
+             }
+
+         }
+        System.out.println(m1);
+         
+        
+        //  ConvertJsonToJava obj= new ConvertJsonToJava();
+        }
+
+        
+    public static String getPrimitiveTypeName(String wrapperClassName) {
+        switch (wrapperClassName) {
+            case "Integer":
+                return "int";
+            case "JSONArray":
+                return "String[]";
+            case "String":
+                return "String";
+            // Add more mappings for other primitive types...
+            default:
+                return null;
+        }
     }
+
+    
 }
