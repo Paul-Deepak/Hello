@@ -51,7 +51,7 @@ public class ConvertJsonToJava {
             case "Integer":
                 return "int";
             case "JSONArray":
-                return "String[]";
+                return "List";
             case "String":
                 return "String";
             default:
@@ -59,8 +59,8 @@ public class ConvertJsonToJava {
         }
     }
 
-    public static void main(String[] args) throws JSONException, NoSuchFieldException, SecurityException,
-            IllegalArgumentException, IllegalAccessException {
+    public static void main(String[] args)  {
+        try{
         String json = "{\"name\":\"Paul\",\"age\":20,\"phoneNo\":[\"12345\",\"98765\",\"567890\"]}";
         // String json2 = "{\"name\": \"John Doe\", \"age\":
         // 30,\"phoneNo\":\"0923456664\"}";
@@ -89,5 +89,9 @@ public class ConvertJsonToJava {
 
         ConvertJsonToJava obj = new ConvertJsonToJava(data);
         System.out.println("Name: " + obj.name + "\nAge: " + obj.age + "\nPhoneNumber: " + obj.phoneNo);
+    }
+    catch(Exception e){
+        e.printStackTrace();
+    }
     }
 }
