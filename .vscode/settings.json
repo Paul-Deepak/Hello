@@ -2,7 +2,5 @@
     "java.project.referencedLibraries": [
         "lib/**/*.jar",
         "c:\\Users\\paul\\Downloads\\org.json.jar\\org.json.jar"
-    ],
-    "java.dependency.packagePresentation": "flat",
-    "java.debug.settings.onBuildFailureProceed": true
+    ]
 }
