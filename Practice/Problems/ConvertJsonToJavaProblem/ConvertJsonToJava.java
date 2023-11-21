@@ -3,48 +3,12 @@ package Practice.Problems.ConvertJsonToJavaProblem;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class ConvertJsonToJava {
-    private int age;
-    private String name;
-    private List<String> phoneNo;
-
-    public ConvertJsonToJava(Map<String, Object> map) throws JSONException {
-        this.age = (int) map.get("age");
-        this.name = String.valueOf(map.get("name"));
-
-        Object phoneNoObj = map.get("phoneNo");
-        if (phoneNoObj instanceof JSONArray) {
-            JSONArray phoneNoArray = (JSONArray) phoneNoObj;
-            this.phoneNo = new ArrayList<>();
-            for (int i = 0; i < phoneNoArray.length(); i++) {
-                this.phoneNo.add(phoneNoArray.getString(i));
-            }
-        }
-    }
-
-    public static Map<String, Object> convertJsonToMap(String json) throws JSONException {
-        JSONObject jsonObject = new JSONObject(json);
-        Map<String, Object> result = new HashMap<>();
-        Iterator<String> keys = jsonObject.keys();
-
-        while (keys.hasNext()) {
-            String key = keys.next();
-            try {
-                Object value = jsonObject.get(key);
-                result.put(key, value);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
 
     public static String getPrimitiveTypeName(String wrapperClassName) {
         switch (wrapperClassName) {
@@ -54,44 +18,46 @@ public class ConvertJsonToJava {
                 return "List";
             case "String":
                 return "String";
+            case "Double":
+                return "Double";
+            case "Float":
+                return "Float";
             default:
                 return null;
         }
     }
 
-    public static void main(String[] args)  {
-        try{
-        String json = "{\"name\":\"Paul\",\"age\":20,\"phoneNo\":[\"12345\",\"98765\",\"567890\"]}";
-        // String json2 = "{\"name\": \"John Doe\", \"age\":
-        // 30,\"phoneNo\":\"0923456664\"}";
-        Map<String, Object> data = convertJsonToMap(json);
+    public static <T> T convertJsonToObj(String jsonData, Class<T> destClass)
+            throws JSONException, IllegalAccessException, InstantiationException, IllegalArgumentException,
+            InvocationTargetException, NoSuchMethodException, SecurityException {
+        JSONObject jsonObject = new JSONObject(jsonData);
 
-        Class<?> Al = ConvertJsonToJava.class;
-        Field[] fields = Al.getDeclaredFields();
+        T obj = destClass.getDeclaredConstructor().newInstance();
 
-        Map<String, String> fieldMap = new HashMap<>();
-        Map<String, Object> m1 = new HashMap<>();
-
-        for (Field field : fields) {
+        for (Field field : destClass.getDeclaredFields()) {
             String fieldName = field.getName();
-            String fieldType = field.getType().getSimpleName();
-            fieldMap.put(fieldName, fieldType);
-        }
-        for (String i : fieldMap.keySet()) {
-            String val1 = fieldMap.get(i);
-            String returndata = getPrimitiveTypeName(data.get(i).getClass().getSimpleName());
-            if (val1.equals(returndata)) {
-                m1.put(i, data.get(i));
-            } else {
-                m1.put(i, "");
+            if (jsonObject.has(fieldName)) {
+                field.setAccessible(true);
+
+                String ExpfieldType = field.getType().getSimpleName();
+                String ObtfieldType = getPrimitiveTypeName(jsonObject.get(fieldName).getClass().getSimpleName());
+                System.out.println(ExpfieldType + "..");
+                System.out.println(ObtfieldType);
+                if (jsonObject.get(fieldName).getClass().getSimpleName().equals("JSONArray")) {
+
+                    JSONArray jsonArray = (JSONArray) jsonObject.get(fieldName);
+                    List<T> list = new ArrayList<>();
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        list.add((T) jsonArray.get(i));
+                    }
+                    field.set(obj, list);
+                } else {
+                    if (ObtfieldType.equals(ExpfieldType)) {
+                        field.set(obj, jsonObject.get(fieldName));
+                    }
+                }
             }
         }
-
-        ConvertJsonToJava obj = new ConvertJsonToJava(data);
-        System.out.println("Name: " + obj.name + "\nAge: " + obj.age + "\nPhoneNumber: " + obj.phoneNo);
-    }
-    catch(Exception e){
-        e.printStackTrace();
-    }
+        return obj;
     }
 }
