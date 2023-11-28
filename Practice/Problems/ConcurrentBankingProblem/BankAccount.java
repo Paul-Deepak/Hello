@@ -3,12 +3,12 @@ package Practice.Problems.ConcurrentBankingProblem;
 public class BankAccount {
     private int balance = 0;
 
-    public void deposit(int amount) {
+    public  synchronized void deposit(int amount) {
         balance += amount;
         System.out.println(Thread.currentThread().getName() + " deposited " + amount + ". New balance: " + balance);
     }
 
-    public void withdraw(int amount) {
+    public synchronized void withdraw(int amount) {
         if (balance >= amount) {
             balance -= amount;
             System.out.println(Thread.currentThread().getName() + " withdrew " + amount + ". New balance: " + balance);
